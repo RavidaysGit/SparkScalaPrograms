@@ -4,7 +4,6 @@ import org.apache.spark.sql.{SparkSession}
 import org.apache.spark.sql.functions._
 import scala.collection.Seq
 
-
 /*  input test data(explode_input.csv)
  * ==================================
  * 	ID|Phone|City
