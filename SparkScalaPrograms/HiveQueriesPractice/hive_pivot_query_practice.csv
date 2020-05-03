@@ -1,0 +1,54 @@
+INPUT data Set
+=============
+ID,Course,Subject,Marks 
+101,MCA,Computer,70
+101,MCA,Account,80
+101,MCA,Datastructure,90
+102,MBA,SAP,30
+102,MBA,Account,50
+102,MBA,Marketing,60
+103,IT,Computer,20
+103,IT,Account,90_
+103,IT,Datastructure,100
+104,EC,Computer,50
+104,EC,Electronics,45
+104,EC,Datastructure,55
+
+
+DDL
+===
+create external table ravidb.pivot_Table(
+ID INT,Course STRING,Subject STRING,Marks INT )
+row format delimited
+fields terminated by ','
+location '/Hive/ExteralTableLocation/pivot_Table'
+tblproperties ("skip.header.line.count"="1");
+
+Aggrigaton query
+================
+select id,course,Computer,Account,Datastructure,SAP,Marketing,Electronics,Total_Marks
+from
+(select 
+id,Course,
+case when collect_list(a.grp['Computer'])[0] is not null then collect_list(a.grp['Computer'])[0] else 0 end as Computer,
+case when collect_list(a.grp['Account'])[0] is not null then collect_list(a.grp['Account'])[0] else 0 end as Account,
+case when collect_list(a.grp['Datastructure'])[0] is not null then collect_list(a.grp['Datastructure'])[0] else 0 end as Datastructure,
+case when collect_list(a.grp['SAP'])[0] is not null then collect_list(a.grp['SAP'])[0] else 0 end as SAP,
+case when collect_list(a.grp['Marketing'])[0] is not null then collect_list(a.grp['Marketing'])[0] else 0 end as Marketing,
+case when collect_list(a.grp['Electronics'])[0] is not null then collect_list(a.grp['Electronics'])[0] else 0 end as Electronics,
+Total_Marks
+from 
+(select id,Course,map(Subject,Marks)as grp,
+sum(Marks) over (PARTITION BY id) as Total_Marks from ravidb.pivot_Table) a
+group by id,Course,Total_Marks)b
+
+======================
+
+RESULT
+=====
+
+id      course  computer account datastructure   sap     marketing  electronics     total_marks
+101     MCA     70         80      90             0       0          0                240
+102     MBA     0          50      0              30      60         0                140
+103     IT      20         90      100            0       0          0                210
+104     EC      50         0       55             0       0          45               150

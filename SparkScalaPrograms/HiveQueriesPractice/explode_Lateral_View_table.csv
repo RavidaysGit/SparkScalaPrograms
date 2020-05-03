@@ -1,0 +1,59 @@
+INPUT Data set
+==============
+
+ID,Phone,City
+1|1234567890,9876543210|BLR,ND
+2|2345678910,8765432190|CH,MB
+
+DDL
+===
+create external table ravidb.explode_Lateral_View(
+ID INT,
+Phone array<BIGINT>,
+City array<STRING>)
+row format delimited
+fields terminated by '|'
+collection items terminated by ','
+location '/Hive/ExteralTableLocation/explode_Lateral_View'
+tblproperties ("skip.header.line.count"="1");
+
+
+
+QUERY
+======
+select id,p.phone,c.city 
+from ravidb.explode_Lateral_View lv 
+lateral view explode(phone) p as phone
+lateral view explode(city) c as city;
+
+OUTPUT
+======
+
+id      p.phone c.city
+1       1234567890      BLR
+1       1234567890      ND
+1       9876543210      BLR
+1       9876543210      ND
+2       2345678910      CH
+2       2345678910      MB
+2       8765432190      CH
+2       8765432190      MB
+
+
+Query with posexplode (positional explode)
+===========================================
+
+select id,phone_no,city_na
+from ravidb.explode_Lateral_View lv 
+lateral view posexplode (phone) p as phn, phone_no
+lateral view outer posexplode (city) c as cty,city_na
+where phn==cty;
+
+OUTPUT
+======
+
+id      phone_no        city_na
+1       1234567890      BLR
+1       9876543210      ND
+2       2345678910      CH
+2       8765432190      MB
