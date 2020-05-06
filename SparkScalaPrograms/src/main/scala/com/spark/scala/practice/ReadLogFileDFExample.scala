@@ -19,8 +19,7 @@ import org.apache.spark.sql.functions._
    /js/ads.js HTTP/1.1" 200 10229 www.yahoo.com "http://www.search.com/index.html" "Mozilla/5.0 (Windows..." "-"
 192.168.72.177 - - "[22/Dec/2002:23:32:19 -0400]" "GET 
    /search.php HTTP/1.1" 400 1997 www.yahoo.com "-" "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; ...)" "-"
- * 
- * 
+ *  
  * 
  * // out put 
  * 
